@@ -22,14 +22,14 @@ async def nodes(id: str = Field(description='Идентификатор элем
 
     # session = Session_lite()  # создание сессии
     try:
-        idbase = get_by_id(id )
-        print(f'idbase = {idbase}')
+        id_base = get_by_id(id )
+        print(f'id_base = {id_base}')
 
-        if idbase == None:  # если не найден id
+        if id_base == None:  # если не найден id
             print(f'не найден id')
             raise ValueError('404')
 
-        elif idbase[3] == 'FOLDER':  # Если папка то ищем все дочерние элементы
+        elif id_base[3] == 'FOLDER':  # Если папка то ищем все дочерние элементы
             parentCat = get_by_parentId_and_type(id, 'FOLDER')  # ищем все дочерние элементы
             print(f'parentCat = {parentCat}')
 
@@ -37,9 +37,9 @@ async def nodes(id: str = Field(description='Идентификатор элем
                 print(f'для пустой папки поле children равно пустому массиву, а для файла равно null')
                 parentOff = get_by_parentId_and_type(id, 'FILE')
                 if len(parentOff) == 0:  # если файлы в папке не найдены
-                    return SystemItem(id=idbase[0], url=idbase[1],
-                                      date=str(idbase[5]).replace(' ', 'T') + "Z", parentId=idbase[2],
-                                      type=idbase[3],
+                    return SystemItem(id=id_base[0], url=id_base[1],
+                                      date=str(id_base[5]).replace(' ', 'T') + "Z", parentId=id_base[2],
+                                      type=id_base[3],
                                       size=None, children=[])
                 else:  # иначе обрабатываем файлы
 
@@ -51,13 +51,13 @@ async def nodes(id: str = Field(description='Идентификатор элем
                     childrenOff = []  # дочерние элементы
                     for file in parentOff:
                         childrenOff.append(
-                            SystemItem(type=file[3], url=file[1], id=file[0], parentId=idbase[0],
+                            SystemItem(type=file[3], url=file[1], id=file[0], parentId=id_base[0],
                                        size=file[4],
                                        date=str(file[5]).replace(' ', 'T') + "Z", children=None))
 
-                    return SystemItem(id=idbase[0], url=idbase[1],
-                                      date=str(idbase[5]).replace(' ', 'T') + "Z", parentId=idbase[2],
-                                      type=idbase[3],
+                    return SystemItem(id=id_base[0], url=id_base[1],
+                                      date=str(id_base[5]).replace(' ', 'T') + "Z", parentId=id_base[2],
+                                      type=id_base[3],
                                       size=allSize, children=[childrenOff])
 
             else:  # если у категории есть дочерние элементы
@@ -65,16 +65,16 @@ async def nodes(id: str = Field(description='Идентификатор элем
                 childrenCat = []  # массив дочерних элементов
 
                 sizeOff = []  # массив для размеров файлов
-                for i in parentCat:  # обрабатываю дочерние элементы
-                    print(f'обрабатываю папки {i}')
-                    parentOff = get_by_parentId_and_type(i[0], 'FILE')
+                for el in parentCat:  # обрабатываю дочерние элементы
+                    print(f'обрабатываю папки {el}')
+                    parentOff = get_by_parentId_and_type(el[0], 'FILE')
                     print(f'файлы = {parentOff}')
 
                     if len(parentOff) == 0:  # если папка не содержит элементов
                         print('Если папка не содержит элементы, то ее размер равен 0.)')
                         childrenCat.append(
-                            SystemItem(type=i[3], url=i[1], id=i[0], parentId=idbase[0], size=0,
-                                       date=str(i[5]).replace(' ', 'T') + "Z", children=None))
+                            SystemItem(type=el[3], url=el[1], id=el[0], parentId=id_base[0], size=0,
+                                       date=str(el[5]).replace(' ', 'T') + "Z", children=None))
 
 
                     else:  # если папка содержит элементы то ищем размер всех
@@ -90,31 +90,31 @@ async def nodes(id: str = Field(description='Идентификатор элем
                         # теперь нужно создать массив файлов
                         for file in parentOff:
                             print(f'файл = {file}')
-                            childrenOff.append(SystemItem(type=file[3], url=file[1], id=file[0], parentId=i[0],
+                            childrenOff.append(SystemItem(type=file[3], url=file[1], id=file[0], parentId=el[0],
                                                           size=file[4],
                                                           date=str(file[5]).replace(' ', 'T') + "Z",
                                                           children=None))
 
                         # после массив файлов кладем в папку
                         childrenCat.append(
-                            SystemItem(type=i[3], url=i[1], id=i[0], parentId=idbase[0], size=allSize,
-                                       date=str(i[5]).replace(' ', 'T') + "Z", children=childrenOff))
+                            SystemItem(type=el[3], url=el[1], id=el[0], parentId=id_base[0], size=allSize,
+                                       date=str(el[5]).replace(' ', 'T') + "Z", children=childrenOff))
 
                 '''Целое число, для папки - это суммарный размер всех элеметов.'''
 
                 mediumCatSize = sum([size for size in sizeOff])
                 print(f'mediumCatSize = {mediumCatSize}')
-                return SystemItem(type=idbase[3], url=idbase[1], id=idbase[0], parentId=idbase[2],
-                                  size=mediumCatSize, date=str(idbase[5]).replace(' ', 'T') + "Z",
+                return SystemItem(type=id_base[3], url=id_base[1], id=id_base[0], parentId=id_base[2],
+                                  size=mediumCatSize, date=str(id_base[5]).replace(' ', 'T') + "Z",
                                   children=childrenCat)
 
-        elif idbase[3] == 'FILE':  # Если файл
+        elif id_base[3] == 'FILE':  # Если файл
 
             print(f'для пустой папки поле children равно пустому массиву'
                   f'а для файла равно null')
-            return SystemItem(id=idbase[0], url=idbase[1], date=str(idbase[5]).replace(' ', 'T') + "Z",
-                              parentId=idbase[2], type=idbase[3],
-                              size=idbase[4], children=None)
+            return SystemItem(id=id_base[0], url=id_base[1], date=str(id_base[5]).replace(' ', 'T') + "Z",
+                              parentId=id_base[2], type=id_base[3],
+                              size=id_base[4], children=None)
 
     except Exception as err:
         print(f'err = {err}')

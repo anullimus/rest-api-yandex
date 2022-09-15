@@ -18,12 +18,12 @@ async def delete_(id: str = Field(description='Идентификатор', exam
 
     init_cursor()
     try:
-        idbase = get_by_id(id)  # поиск id в базе
-        print(f'idbase = {idbase}')
+        id_base = get_by_id(id)  # поиск id в базе
+        print(f'id_base = {id_base}')
 
-        if idbase is None:  # если не найден id
+        if id_base is None:  # если не найден id
             return HTTPException(status_code=404, detail="Папка/файл не найден(-а).")
-        elif idbase[3] == 'FOLDER':  # Если папка
+        elif id_base[3] == 'FOLDER':  # Если папка
             print(f'При удалении папки удаляются все дочерние элементы.')
             # ищем все дочерние папки и удаляем их
             parentCat = get_by_parentId_and_type(id, 'FOLDER')
@@ -42,7 +42,7 @@ async def delete_(id: str = Field(description='Идентификатор', exam
             return HTTPException(status_code=200, detail="Удаление прошло успешно.")
 
 
-        elif idbase[3] == 'FILE':  # Если файл
+        elif id_base[3] == 'FILE':  # Если файл
             delete_by_id(id)
 
             return HTTPException(status_code=200, detail="Удаление прошло успешно.")
