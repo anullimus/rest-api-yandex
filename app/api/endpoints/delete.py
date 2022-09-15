@@ -1,5 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends
-from fastapi_limiter.depends import RateLimiter
+from fastapi import APIRouter, HTTPException
 from pydantic import Field
 from app.db.db_postgres import init_cursor, get_by_id, get_by_parentId_and_type, delete_by_parentId, \
     delete_by_id

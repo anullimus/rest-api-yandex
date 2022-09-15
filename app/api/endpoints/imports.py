@@ -1,5 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends
-from fastapi_limiter.depends import RateLimiter
+from fastapi import APIRouter, HTTPException
 
 from app.db.db_postgres import get_by_id, init_cursor, insert_to_bd, update_date_by_id, \
     update_values_by_id

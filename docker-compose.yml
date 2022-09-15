@@ -2,43 +2,18 @@ version: "3.7"
 
 
 services:
-    api_1:
-        container_name: api
+    app:
+        container_name: app
+        image: app
         ports:
         - "80:8000"
         build:
             context: .
+            dockerfile: Dockerfile
 
-        # command: python app.py
-        depends_on:
-            - redis_api
-        restart: always
-
-        volumes:
-        - .:/app
-
-
-    redis_api:
-        image: redis
-        restart: always
-#        ports:
-#        - "127.0.0.1:6379:6379"
-        volumes:
-        - ./logs:/log
-services:
-  database:
-    image: postgres
-    container_name: ${DATABASE_HOST}
-    environment:
-      - POSTGRES_USER=${DATABASE_USERNAME}
-      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
-      - POSTGRES_DB=${DATABASE_NAME}
-    command: postgres -p ${DATABASE_PORT}
-    ports:
-      - ${DATABASE_PORT}:${DATABASE_PORT}
-    volumes:
-      - ./database/postgresql-docker-image/database_data:/var/lib/postgresql/data
-      - ./database/postgresql-docker-image/create_tables.sql:/docker-entrypoint-initdb.d/1-create_tables.sql:ro
-      - ./database/postgresql-docker-image/fill_tables.sql:/docker-entrypoint-initdb.d/2-fill_tables.sql:ro
-      - ./database/postgresql-docker-image/generated_data:/generated_data
-      - ./database/postgresql-docker-image/specialties.txt:/specialties.txt
+    database:
+        image: postgres
+        container_name: "localhost"
+#        command: postgres -p 8080
+        ports:
+          - "5432:5432"
