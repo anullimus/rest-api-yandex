@@ -4,7 +4,7 @@ from app.api.endpoints.delete import router_delete
 from app.api.endpoints.nodes import router_nodes
 
 import uvicorn
-from app.db.db_postgres import connect_db, disconnect_db, create_table
+from app.db.db_postgres import connect_db, disconnect_db, create_table, drop_table
 
 
 def add_events(fastapi_app: FastAPI) -> None:
@@ -19,6 +19,7 @@ def add_events(fastapi_app: FastAPI) -> None:
 
     @fastapi_app.on_event("shutdown")
     def shutdown_event() -> None:
+        # drop_table()
         disconnect_db()
 
 
@@ -38,4 +39,4 @@ def create_app() -> FastAPI:
 app = create_app()
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="localhost", port=8000)
+    uvicorn.run(app, host="localhost", port=8080)
