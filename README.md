@@ -2,7 +2,7 @@
 Rest API Service task in backend school of Yandex
 
 ## Information
-* The project built on Fast Api framework, work with PostgreSQL and could be run with Docker
+* The project has been built on Fast Api framework, work with PostgreSQL and could be run with Docker
 * It should be run with uvicorn web server implementation
 
 ## Requirements
