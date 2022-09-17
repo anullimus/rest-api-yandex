@@ -32,6 +32,7 @@ router_imports = APIRouter()
 async def import_post(Data: SystemItemImportRequest):
     used_id = []  # массив для id \\ id - файла/FILE или папки/FOLDER является уникальным среди файлов и папок
     init_cursor()
+    idInd, urlInd, parentIdInd, typeInd, sizeInd, updateDateInd = 0, 1, 2, 3, 4, 5
     try:
         for el in Data.items:  # обаратываем каждый элемент файлов
             if el.id in used_id:
@@ -80,7 +81,7 @@ async def import_post(Data: SystemItemImportRequest):
                     insert_to_bd(id=el.id, url=el.url, parentId=el.parentId, type=el.type,
                                                size=el.size, updateDate=Data.updateDate)
 
-                elif parent_id_base[3] == 'FILE':  # Если тип родителя файл
+                elif parent_id_base[typeInd] == 'FILE':  # Если тип родителя файл
                     print('родителем/parentId элемента может быть только папка')
                     return HTTPException(status_code=400,
                                          detail="Невалидная схема документа или входные данные не верны"
@@ -100,7 +101,7 @@ async def import_post(Data: SystemItemImportRequest):
                             parent_id = get_by_id(el.parentId) # поиск id папки выше
                             print(f'**************' * 30)
                             print(f'parent_id = {parent_id}')
-                            update_date_by_id(parent_id[2], Data.updateDate)
+                            update_date_by_id(parent_id[parentIdInd], Data.updateDate)
                         except:
                             print(f'ошибка обновления папки 0')
                     except:
@@ -111,7 +112,7 @@ async def import_post(Data: SystemItemImportRequest):
             else:  # Если id есть в базе, то меняем его
                 print(f'обновляем id')
 
-                if el.type != id_base[3]:  # Если попытаются поменять тип элемента
+                if el.type != id_base[typeInd]:  # Если попытаются поменять тип элемента
                     print(f'''Импортирует элементы файловой системы. Элементы импортированные повторно обновляют текущие.
                                 Изменение типа элемента с папки на файл и с файла на папку не допускается. ''')
                     return HTTPException(status_code=400,
@@ -126,14 +127,14 @@ async def import_post(Data: SystemItemImportRequest):
                     """
 
                     print(f'обновляем в бд')
-                    if id_base[3] == 'FILE':
+                    if id_base[typeInd] == 'FILE':
                         print(f'обновляем файл')
                         update_values_by_id(el.id, el.url, el.parentId, el.type, el.size, Data.updateDate)
                         print(f'обновляем время у самой папки')
                         update_date_by_id(el.parentId, Data.updateDate)
                         try:  # обновление главной папки
                             parent_id = get_by_id(el.parentId)  # поиск id папки выше
-                            update_date_by_id(parent_id[2], Data.updateDate)
+                            update_date_by_id(parent_id[parentIdInd], Data.updateDate)
                         except Exception as err:
                             print(err)
                             print(f'ошибка обновления папки 2')
@@ -142,7 +143,7 @@ async def import_post(Data: SystemItemImportRequest):
                         print(f'обновление папки')
                         update_values_by_id(el.id, el.url, el.parentId, el.type, el.size, Data.updateDate)
 
-                        if id_base[5] != Data.updateDate:  # новая метка времен
+                        if id_base[updateDateInd] != Data.updateDate:  # новая метка времен
                             print(f'обновляю метку у самой папки')
                             update_date_by_id(el.parentId, Data.updateDate)
 
@@ -152,9 +153,9 @@ async def import_post(Data: SystemItemImportRequest):
                                 parent_id = get_by_id(el.parentId)  # поиск id папки выше
                                 print(f'**************' * 30)
                                 print(f'parent_id = {parent_id}')
-                                update_date_by_id(parent_id[2], Data.updateDate)
+                                update_date_by_id(parent_id[parentIdInd], Data.updateDate)
                             except:
-                                print(id_base[5])
+                                print(id_base[updateDateInd])
                                 print(Data.updateDate)
                                 print(f'ошибка обновления папки 3')
 
